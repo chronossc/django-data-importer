@@ -3,10 +3,11 @@ from data_importer.exceptions import *
 from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
 
-class Reader(object):
+class BaseReader(object):
 
     loaded = False
     source = None
+    headers = None
 
     def __init__(self,f):
         """
@@ -23,14 +24,11 @@ class Reader(object):
         """
         try:
             if isinstance(source, file):
-                self.source = f
+                self.source = source
             if isinstance(source, basestring):
                 self.source = open(source, 'rb')
         except Exception, err:
             raise UnknowSource(err)
-
-        if not self.source:
-            raise UnreadableFile
 
         self.loaded = True
 
@@ -55,18 +53,18 @@ class Reader(object):
             return smart_unicode(val)
         return val
 
-    def get_item(self,header,row):
+    def get_item(self,row):
         """
         Given a header and a row return a sorted dict
         """
-        d = SortedDict(zip(header,row))
-        d.keyOrder = header
+        d = SortedDict(zip(self.headers,row))
+        d.keyOrder = self.headers
         return d
 
     def get_items(self):
         """
         Iterator do read the rows of file. Should return a dict with fields
-        name and values.
+        name and values. get_items should set headers too.
         """
         raise NotImplementedError
 
