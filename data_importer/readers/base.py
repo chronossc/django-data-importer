@@ -1,6 +1,7 @@
 # coding: utf-8
 from data_importer.exceptions import *
 from django.utils.encoding import smart_unicode
+from django.utils.datastructures import SortedDict
 
 class Reader(object):
 
@@ -54,6 +55,14 @@ class Reader(object):
             return smart_unicode(val)
         return val
 
+    def get_item(self,header,row):
+        """
+        Given a header and a row return a sorted dict
+        """
+        d = SortedDict(zip(header,row))
+        d.keyOrder = header
+        return d
+
     def get_items(self):
         """
         Iterator do read the rows of file. Should return a dict with fields
@@ -61,4 +70,4 @@ class Reader(object):
         """
         raise NotImplementedError
 
-    
+

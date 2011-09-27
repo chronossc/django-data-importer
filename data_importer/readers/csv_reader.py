@@ -2,16 +2,6 @@
 import csv
 from .base import Reader
 
-#class CSVReader(Reader):
-#    def read_file(self):
-#        lines = []
-#        for i,line in enumerate(csv.reader(self.f,delimiter=';')):
-#            if i == 0:
-#                self.headers = line
-#                continue
-#            lines.append(line)
-#        return lines
-
 class CSVReader(Reader):
 
     def __init__(self,f,delimiter=';'):
@@ -23,5 +13,5 @@ class CSVReader(Reader):
         header = reader.next()
         for row in reader:
             if not row: continue
-            yield dict(zip(header,row))
+            yield self.get_item(header,row)
 
