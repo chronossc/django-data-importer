@@ -27,4 +27,3 @@ class CSVReader(BaseReader):
         for row in reader:
             if not row: continue
             yield self.get_item(row)
-

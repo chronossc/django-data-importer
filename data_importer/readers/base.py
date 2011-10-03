@@ -1,7 +1,6 @@
 # coding: utf-8
-from data_importer.exceptions import *
-from django.utils.encoding import smart_unicode
 from django.utils.datastructures import SortedDict
+from django.utils.encoding import smart_unicode
 
 class BaseReader(object):
 
@@ -56,8 +55,13 @@ class BaseReader(object):
     def get_item(self,row):
         """
         Given a header and a row return a sorted dict
-        """
-        d = SortedDict(zip(self.headers,row))
+        """ 
+        d = SortedDict(zip(self.headers,map(smart_unicode,row)))
+        # since zip cut tuple to smaller sequence, if we get incomplete
+        # lines in file this for over headers put it on row dict
+        for k in self.headers:
+            if k not in d:
+                d[k]=u''
         d.keyOrder = self.headers
         return d
 
