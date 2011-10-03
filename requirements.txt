@@ -1,0 +1,2 @@
+xlrd # support for read excel xls files
+openpyxl # support for read excel xlsx files
