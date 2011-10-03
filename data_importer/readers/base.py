@@ -33,7 +33,7 @@ class BaseReader(object):
         self.loaded = True
         self.set_reader()
         assert self._reader is not None
-        assert self.headers is not None
+        assert self.headers is not None # call self.get_headers
 
     def unload(self):
         """
