@@ -28,7 +28,9 @@ class ReaderTest(TestCase):
         """
         mod_dir = os.path.realpath(os.path.dirname(data_importer.tests.__file__))
         self.files = {
-            'csv_sheet': os.path.join(mod_dir,'fixtures','csv_sheet.csv')
+            'csv_sheet': os.path.join(mod_dir,'fixtures','csv_sheet.csv'),
+            'xls_sheet': os.path.join(mod_dir,'fixtures','xls_sheet.xls'),
+            'xlsx_sheet': os.path.join(mod_dir,'fixtures','xlsx_sheet.xlsx'),           
         }
 
         self.f_headers = ['cpf','field3','field4','field5']
@@ -48,7 +50,8 @@ class ReaderTest(TestCase):
     def test_base_reader_init(self):
         self.assertTrue(os.path.isfile(self.files['csv_sheet']),u"file for basereader test not exists")
         reader = data_importer.readers.BaseReader(self.files['csv_sheet'])
-        self.assertEquals(open(self.files['csv_sheet'],'rb').read(),reader.source.read())
+        f = open(self.files['csv_sheet'],'rb').read()
+        self.assertEquals(f,reader._source.read())
 
     def test_csv_reader(self):
         """
@@ -61,5 +64,27 @@ class ReaderTest(TestCase):
     def test_csv_lines(self):
         reader = data_importer.readers.CSVReader(self.files['csv_sheet'])
         self.compare_lines([line for line in reader])
-        
 
+    def test_xls_reader(self):
+        """
+        Compare data return by CSVReader from csv_sheet.csv file to know data
+        """
+        reader = data_importer.readers.XLSReader(self.files['xls_sheet'])
+        [line for line in reader]
+        self.assertEquals(self.f_headers,reader.headers)
+
+    def test_xls_lines(self):
+        reader = data_importer.readers.XLSReader(self.files['xls_sheet'])
+        self.compare_lines([line for line in reader])
+
+    def test_xlsx_reader(self):
+        """
+        Compare data return by CSVReader from csv_sheet.csv file to know data
+        """
+        reader = data_importer.readers.XLSXReader(self.files['xlsx_sheet'])
+        [line for line in reader]
+        self.assertEquals(self.f_headers,reader.headers)
+
+    def test_xlsx_lines(self):
+        reader = data_importer.readers.XLSXReader(self.files['xlsx_sheet'])
+        self.compare_lines([line for line in reader])        

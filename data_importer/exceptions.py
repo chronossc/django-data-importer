@@ -1,6 +1,5 @@
 # coding: utf-8
 
-
 class UnknowSource(Exception):
     msg = u"The source file can't be opened"
     def __init__(self,err=None):
