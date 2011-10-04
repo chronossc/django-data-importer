@@ -117,7 +117,6 @@ class BaseImporterTests(TestCase):
 
     def test_base_importer_validation(self):
         importer = BaseImportWithFields(self.files['csv_sheet'])
-        print id(importer)
         self.assertTrue(importer.is_valid(),u"BaseImporter isn't valid for CSV sheet.")
         del(importer)
 
@@ -130,7 +129,6 @@ class ImportersTests(TestCase):
  
     def test_simple_validation(self):
         importer = SimpleValidationsImporter(self.files['csv_invalid_cpf_sheet'])
-        print id(importer)
         self.assertTrue(not importer._validation_results,u"How by the hell _validation_results is filled with no validation called!?")
         self.assertTrue(not importer.errors,u"How by the hell errors is filled with no validation called!?")
         self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")

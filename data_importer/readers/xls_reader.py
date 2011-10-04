@@ -30,7 +30,6 @@ class XLSReader(BaseReader):
         for r in range(1,self.nrows):
             values = [self._reader.cell(r,c).value for c in range(self.ncols)]
             if not all(values): continue
-            print self.get_item(values)
             yield self.get_item(values)
 
 class XLSXReader(XLSReader):

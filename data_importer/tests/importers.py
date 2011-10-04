@@ -4,13 +4,28 @@
 from data_importer import BaseImporter, ValidationError
 from data_importer.tests.cpfcnpj import CPF
 from django.utils.encoding import smart_unicode
+import logging
 
+# define a null logging handler, like in py 2.7 docs: 
+# http://docs.python.org/library/logging.handlers.html#nullhandler
+class NullHandler(logging.Handler):
+    def emit(self,record):
+        pass
+
+    def handle(self,record):
+        pass
+
+    def createLock(self):
+        return None
 
 class BaseImportWithFields(BaseImporter):
     """
     Just add fields so validate_class pass :)
     """
     fields = ['cpf','field3','field4','field5']
+
+    def get_logger_handlers(self):
+        return [(NullHandler,(),{})]
 
 class SimpleValidationsImporter(BaseImportWithFields):
     """

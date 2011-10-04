@@ -79,7 +79,6 @@ class BaseImporter(object):
             pass
         try:
             for h,hargs,hkwargs in self.get_logger_handlers():
-                print h,hargs,hkwargs
                 self.logger.addHandler(h(*hargs,**hkwargs))
         except NotImplementedError:
             logging.basicConfig(format=u'%(asctime)s :: %(levelname)s :: %(message)s')
