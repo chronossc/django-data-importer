@@ -70,7 +70,7 @@ class BaseImporter(object):
         return READERS_X_EXTENSIONS[parts[-1].lower()](self.import_file,**reader_kwargs)
 
     def set_logger(self):
-        self.logger = logging.getLogger()
+        self.logger = logging.getLogger('%s_importer' % self.__class__.__name__)
         self.logger.propagate = False
         try:
             if settings.DEBUG:
@@ -78,6 +78,7 @@ class BaseImporter(object):
         except ImportError:
             pass
         try:
+            self.logger.handlers = []
             for h,hargs,hkwargs in self.get_logger_handlers():
                 self.logger.addHandler(h(*hargs,**hkwargs))
         except NotImplementedError:
@@ -126,14 +127,16 @@ class BaseImporter(object):
         def append_error(field,msg):
             if i not in self.errors:
                 self.errors[i] = []
-            msg
-            self.errors[i] = list(set(self.errors[i]+[smart_unicode(msg)]))
-            return smart_unicode(msg)
+            self.errors[i] = list(set(self.errors[i]+map(smart_unicode,msg.messages)))
+            return map(smart_unicode,msg.messages)[0]
 
         # validate required fields first
         for field in self.required_fields:
             if row[field] in EMPTY_VALUES:
-                line_errors[field] = append_error(field,u"Field %s is required!" % field)
+                if field not in line_errors:
+                    line_errors[field] = [append_error(field,u"Field %s is required!" % field)]
+                else:
+                    line_errors[field].append(append_error(field,u"Field %s is required!" % field))
                 continue
 
         # now validate each field
@@ -145,13 +148,17 @@ class BaseImporter(object):
                     val = getattr(self,'clean_%s' % field)(row[field])
                     row[field] = val
                 except ValidationError, msg:
-                    line_errors[field] = append_error(field,msg)
+                    if field not in line_errors:
+                        line_errors[field] = [append_error(field,msg)]
+                    else:
+                        line_errors[field].append(append_error(field,msg))
 
         if line_errors:
             self.errors[i] = line_errors.copy()
             self._validation_results[i] = False
             for field,error in line_errors.items():
-                self.logger.error("Line %s, field %s: %s",i,field,error)
+                for errmsg in error:
+                    self.logger.error("Line %s, field %s: %s",i,field,errmsg)
             return False
         self._validation_results[i] = row
         return row

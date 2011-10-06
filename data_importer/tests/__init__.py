@@ -5,6 +5,8 @@ import os
 import data_importer
 from django.test import TestCase
 from importers import BaseImportWithFields, SimpleValidationsImporter, RequiredFieldValidationsImporter
+from django.utils.datastructures import SortedDict
+from data_importer.tests.mocks import MockLoggingHandler
 
 def setUpClassData(klass):
     """
@@ -120,16 +122,77 @@ class BaseImporterTests(TestCase):
         self.assertTrue(importer.is_valid(),u"BaseImporter isn't valid for CSV sheet.")
         del(importer)
 
-class ImportersTests(TestCase):
+    def test_before_clean__validation_results(self):
+        """ attr __validation_results should be empty SortedDict """
+        importer = SimpleValidationsImporter(self.files['csv_sheet'])
+        self.assertEquals(SortedDict(),importer._validation_results)
+
+    def test_before_clean_errors(self):
+        """ attr errors should be empty SortedDict """
+        importer = SimpleValidationsImporter(self.files['csv_sheet'])
+        self.assertEquals(SortedDict(),importer.errors)
+
+    def test_mock_log_instance(self):
+        importer = SimpleValidationsImporter(self.files['csv_sheet'])
+        self.assertTrue(isinstance(importer.logger.handlers[0],MockLoggingHandler))
+
+
+    def test_mock_log_instance_handler(self):
+        importer = SimpleValidationsImporter(self.files['csv_sheet'])
+        self.assertTrue(isinstance(importer.logger.handlers[0],MockLoggingHandler))
+
+    def test_mock_log_instance_handlers(self):
+        """
+        Each time we call set_logger only one instance of handlers should
+        exist. We should assert that only one instance of each handlers is live
+        """
+        importer = SimpleValidationsImporter(self.files['csv_sheet'])
+        instances = []
+        for i in importer.logger.handlers:
+            self.assertTrue(i.__class__.__name__ not in instances,u"More than one logger with same class found in importer.logger.handlers")
+            instances.append(i.__class__.__name__)
+                     
+
+class ImportersInvalidDataTests(TestCase):
     """
     This test will test other importers that should validate data.
     """
     def setUp(self):
         setUpClassData(self)
- 
-    def test_simple_validation(self):
+
+        self.data_invalid = [
+            {'cpf': u'', 'field3': u'', 'field4': u'Emperor Palpatine: Soon the Rebellion will be crushed and young Skywalker will be one of us!', 'field5': u''},
+            {'cpf': u'441.903.660-64', 'field3': u'Darth Vader: When I left you, I was but the learner. Now I am the master.', 'field4': u'some data for field 4', 'field5': u''},
+            {'cpf': u'46177843514', 'field3': u'Ben (Obi-Wan) Kenobi: The Force can have a strong influence on a weak mind.', 'field4': u'', 'field5': u'some data for field 5'},
+            {'cpf': u'87894839957', 'field3': u'Ben (Obi-Wan) Kenobi: The Force can have a strong influence on a weak mind.', 'field4': u'', 'field5': u''},
+            {'cpf': u'933.331.456-34', 'field3': u'lines 3 and 5 have invalid cpfs, line 2 have null cpf', 'field4': u'', 'field5': u''},
+        ]
+        self.invalid_lines = {2: {'cpf': [u'Invalid CPF number.']}, 3: {'cpf': [u'Invalid CPF number.']}}
+        self.logger_error_messages = [u"Line 2, field cpf: Invalid CPF number.", u"Line 3, field cpf: Invalid CPF number."]
+
+    def test_simple_false_validation(self):
         importer = SimpleValidationsImporter(self.files['csv_invalid_cpf_sheet'])
-        self.assertTrue(not importer._validation_results,u"How by the hell _validation_results is filled with no validation called!?")
-        self.assertTrue(not importer.errors,u"How by the hell errors is filled with no validation called!?")
         self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
-        del(importer)
+
+    def test_invalid_lines(self):
+        importer = SimpleValidationsImporter(self.files['csv_invalid_cpf_sheet'])
+        self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
+        for i in self.invalid_lines:
+            self.assertEquals(False,importer._validation_results[i])
+
+    def test_invalid_errors(self):
+        importer = SimpleValidationsImporter(self.files['csv_invalid_cpf_sheet'])
+        self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
+        self.assertNotEquals(SortedDict(),importer.errors) # importer.errors shouldn't be empty
+
+        for i in importer.errors:
+            self.assertEquals(True,i in self.invalid_lines)
+            for k,v in importer.errors[i].items():
+                self.assertEquals(True,k in self.invalid_lines[i])
+                self.assertEquals(self.invalid_lines[i][k],v)
+
+    def test_invalid_errors_in_logging(self):
+        importer = SimpleValidationsImporter(self.files['csv_invalid_cpf_sheet'])
+        self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
+        self.assertTrue(importer.logger)
+        self.assertEquals(self.logger_error_messages,importer.logger.handlers[0].messages['error'])
