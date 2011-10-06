@@ -4,9 +4,12 @@
 import os
 import data_importer
 from django.test import TestCase
-from importers import BaseImportWithFields, SimpleValidationsImporter, RequiredFieldValidationsImporter
+from data_importer.tests.importers import BaseImportWithFields, SimpleValidationsImporter, RequiredFieldValidationsImporter,\
+    SimpleValidationsImporterDB, RequiredFieldValidationsImporterDB
 from django.utils.datastructures import SortedDict
 from data_importer.tests.mocks import MockLoggingHandler
+from data_importer.handlers import DBLoggingHandler
+from data_importer.tests.models import Error
 
 def setUpClassData(klass):
     """
@@ -194,5 +197,52 @@ class ImportersInvalidDataTests(TestCase):
     def test_invalid_errors_in_logging(self):
         importer = SimpleValidationsImporter(self.files['csv_invalid_cpf_sheet'])
         self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
-        self.assertTrue(importer.logger)
+        self.assertTrue(importer.logger,u"Logger isn't set")
         self.assertEquals(self.logger_error_messages,importer.logger.handlers[0].messages['error'])
+
+    def test_invalid_errors_in_logging_to_DB(self):
+        importer = SimpleValidationsImporterDB(self.files['csv_invalid_cpf_sheet'])
+
+        self.assertEquals([],list(Error.objects.all())) # apply list to queryset
+        self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
+        self.assertTrue(importer.logger,u"Logger isn't set")
+        self.assertTrue(isinstance(importer.logger.handlers[0],DBLoggingHandler),u"Logger handler isn't DBLoggingHandler")
+
+        errors = Error.objects.all()
+        self.assertTrue(u"SimpleValidationsImporterDB_importer :: error :: Line 2, field cpf: Invalid CPF number." in \
+            str(errors[0]),u"Weird string for this test, check loggers.")
+        self.assertTrue(u"SimpleValidationsImporterDB_importer :: error :: Line 3, field cpf: Invalid CPF number." in \
+            str(errors[1]),u"Weird string for this test, check loggers.")
+
+    def test_invalid_required_field(self):
+        
+        invalid_lines = self.invalid_lines.copy()
+        invalid_lines.update({1: {'field3': [u'Field field3 is required!'], 'cpf': [u'Field cpf is required!']}})
+
+        importer = RequiredFieldValidationsImporter(self.files['csv_invalid_cpf_sheet'])
+        self.assertEquals([],list(Error.objects.all())) # apply list to queryset
+        self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
+
+        for i in importer.errors:
+            self.assertEquals(True,i in invalid_lines)
+            for k,v in importer.errors[i].items():
+                self.assertEquals(True,k in invalid_lines[i])
+                self.assertEquals(invalid_lines[i][k],v)
+
+    def test_invalid_required_field_DB(self):
+        importer = RequiredFieldValidationsImporterDB(self.files['csv_invalid_cpf_sheet'])
+
+        self.assertEquals([],list(Error.objects.all())) # apply list to queryset
+        self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
+        self.assertTrue(importer.logger,u"Logger isn't set")
+        self.assertTrue(isinstance(importer.logger.handlers[0],DBLoggingHandler),u"Logger handler isn't DBLoggingHandler")
+
+        errors = Error.objects.all()
+        self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 1, field field3: Field field3 is required!" in \
+            str(errors[0]),u"Weird string for this test, check loggers.")
+        self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 1, field cpf: Field cpf is required!" in \
+            str(errors[1]),u"Weird string for this test, check loggers.")
+        self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 2, field cpf: Invalid CPF number." in \
+            str(errors[2]),u"Weird string for this test, check loggers.")
+        self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 3, field cpf: Invalid CPF number." in \
+            str(errors[3]),u"Weird string for this test, check loggers.")

@@ -127,8 +127,12 @@ class BaseImporter(object):
         def append_error(field,msg):
             if i not in self.errors:
                 self.errors[i] = []
-            self.errors[i] = list(set(self.errors[i]+map(smart_unicode,msg.messages)))
-            return map(smart_unicode,msg.messages)[0]
+            if isinstance(msg,ValidationError):
+                self.errors[i] = list(set(self.errors[i]+map(smart_unicode,msg.messages)))
+                return map(smart_unicode,msg.messages)[0]
+            else:
+                self.errors[i] = list(set(self.errors[i] + [smart_unicode(msg)]))
+                return smart_unicode(msg)
 
         # validate required fields first
         for field in self.required_fields:

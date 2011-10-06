@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'django_nose',
     'data_importer',
+    'data_importer.tests', # important to test logger to DB
     'sample'
 )
 
