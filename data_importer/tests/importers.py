@@ -39,7 +39,7 @@ class SimpleValidationsImporterDB(SimpleValidationsImporter):
     """
     Since all tested importers will validate same data, we can write only one
     with validate methods.
-    This importer doesn't implement save method that return data as dict in 
+    This importer doesn't implement save method that return data as list of dict in 
     BaseImporter.save and doesn't put any field as required.
     """
 
@@ -50,7 +50,7 @@ class RequiredFieldValidationsImporter(SimpleValidationsImporter):
     """
     Since all tested importers will validate same data, we can write only one
     with validate methods.
-    This importer doesn't implement save method that return data as dict in 
+    This importer doesn't implement save method that return data as list of dict in 
     BaseImporter.save but use CPF and FIELD3 fields as required.
     """
     required_fields = ['cpf','field3']
@@ -67,7 +67,7 @@ class RequiredFieldValidationsImporterDB(RequiredFieldValidationsImporter):
     """
     Since all tested importers will validate same data, we can write only one
     with validate methods.
-    This importer doesn't implement save method that return data as dict in 
+    This importer doesn't implement save method that return data as list of dict in 
     BaseImporter.save but use CPF and FIELD3 fields as required.
     """
 

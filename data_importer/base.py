@@ -101,6 +101,11 @@ class BaseImporter(object):
         for i,row in enumerate(self.reader,1):
             self._clean(i,row)
 
+    def _iter_clean_all(self):
+        self.errors = SortedDict()
+        for i,row in enumerate(self.reader,1):
+            yield i,self._clean(i,row)
+
     def _clean(self,i,_row):
         """
         Walk over all fields in a row and validate it. Validations will be cached.
@@ -165,4 +170,23 @@ class BaseImporter(object):
                     self.logger.error("Line %s, field %s: %s",i,field,errmsg)
             return False
         self._validation_results[i] = row
+        return row
+
+    def save_all_iter(self):
+        return self.save_all(use_generator=True)
+
+    def save_all(self,use_generator=False):
+        if use_generator:
+            def save_gen(self):
+                for i,row in self._iter_clean_all():
+                    yield self.save(i,row)
+            return save_gen(self)
+        else:
+            return [self.save(i,row) for i,row in self._iter_clean_all()]
+
+    def save(self,i,row):
+        """
+        Save method should be customized to save data as user want.
+        The default one just return row.
+        """
         return row

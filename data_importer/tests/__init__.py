@@ -4,6 +4,7 @@
 import os
 import data_importer
 from django.test import TestCase
+from data_importer.tests.cpfcnpj import CPF
 from data_importer.tests.importers import BaseImportWithFields, SimpleValidationsImporter, RequiredFieldValidationsImporter,\
     SimpleValidationsImporterDB, RequiredFieldValidationsImporterDB
 from django.utils.datastructures import SortedDict
@@ -153,10 +154,9 @@ class BaseImporterTests(TestCase):
         instances = []
         for i in importer.logger.handlers:
             self.assertTrue(i.__class__.__name__ not in instances,u"More than one logger with same class found in importer.logger.handlers")
-            instances.append(i.__class__.__name__)
-                     
+            instances.append(i.__class__.__name__)                     
 
-class ImportersInvalidDataTests(TestCase):
+class ImportersValidationsTests(TestCase):
     """
     This test will test other importers that should validate data.
     """
@@ -215,7 +215,7 @@ class ImportersInvalidDataTests(TestCase):
             str(errors[1]),u"Weird string for this test, check loggers.")
 
     def test_invalid_required_field(self):
-        
+        # invalid lines for RequiredFieldValidationsImporter includes line 1 :)
         invalid_lines = self.invalid_lines.copy()
         invalid_lines.update({1: {'field3': [u'Field field3 is required!'], 'cpf': [u'Field cpf is required!']}})
 
@@ -246,3 +246,23 @@ class ImportersInvalidDataTests(TestCase):
             str(errors[2]),u"Weird string for this test, check loggers.")
         self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 3, field cpf: Invalid CPF number." in \
             str(errors[3]),u"Weird string for this test, check loggers.")
+
+    def test_save(self):
+        # test save against invalid lines
+        invalid_lines = self.invalid_lines.copy()
+        invalid_lines.update({1: {'field3': [u'Field field3 is required!'], 'cpf': [u'Field cpf is required!']}})
+        importer = RequiredFieldValidationsImporterDB(self.files['csv_invalid_cpf_sheet'])
+        results = [i for i in importer.save_all_iter()]
+        for i,know_data in enumerate(self.data_invalid):
+            data = results[i]
+            if not data and i+1 in invalid_lines: # dict data starts from 1
+                self.assertEquals(data,False)
+            else:
+                for k,v in know_data.items():
+                    # RequiredFieldValidationsImporterDB should return field
+                    # CPF as instance of data_importer.tests.cpfcnpj.CPF class,
+                    # so we make cpf a instance before comparation
+                    if k == 'cpf':
+                        v = CPF(v)
+                    self.assertEquals(True,k in data)
+                    self.assertEquals(data[k],v)
