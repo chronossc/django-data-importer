@@ -142,8 +142,12 @@ If you like the project, plz, contact me at philipe.rp@gmail.com (gtalk and emai
 Here is some stuff that I like to put:
 
 * Better logging support on various methods of BaseImporter
+* Add a SentryLogginHandler to data_importer
 * Add support to more file formats, like openoffice ones, pure xmls, JSON and any other type adding readers to it.
 * Add support to stream in readers, so user can put text instead a file and maybe avoid disk I/O.
 * Add support to gettext and internatiolization
 * Add a ModelBaseReader class that read fields from a Model and save directly to a model, using model field validations.
-* Make data_imporonter works without Django, so anyone in Python world can use it.
+* Make data_importer works without Django, so anyone in Python world can use it.
+
+# TIP: READ THE TESTS, THEY COVER A LOT OF WAYS TO USE DATA IMPORTER :)
+
