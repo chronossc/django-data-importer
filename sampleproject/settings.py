@@ -98,7 +98,6 @@ INSTALLED_APPS = (
     'django_nose',
     'data_importer',
     'data_importer.tests', # important to test logger to DB
-    'sample'
 )
 
 #TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
