@@ -31,9 +31,11 @@ class Importer1(BaseImporter):
     required_fields = ['email'] # optional
 
     def clean_email(self,val):
+        # validate_email raises ValidationError if invalid
         from django.core.validators import validate_email
         validate_email(val)
-        # validate_email raises ValidationError if invalid
+        return val
+        
 
 ```
 ### Important (and basic) things!
@@ -148,6 +150,8 @@ Here is some stuff that I like to put:
 * Add support to gettext and internatiolization
 * Add a ModelBaseReader class that read fields from a Model and save directly to a model, using model field validations.
 * Make data_importer works without Django, so anyone in Python world can use it.
+
+**If you will contribute, I'll keep master branch stable and develop all things on master_dev branche.**
 
 # TIP: READ THE TESTS, THEY COVER A LOT OF WAYS TO USE DATA IMPORTER :)
 
