@@ -23,7 +23,7 @@ class XLSReader(BaseReader):
     @property
     def headers(self):
         if not self._headers:
-            self._headers = [self._reader.cell(0,c).value for c in range(self.ncols)]
+            self._headers = map(self.normalize_string,[self._reader.cell(0,c).value for c in range(self.ncols)])
         return self._headers
 
     def get_items(self):
@@ -44,7 +44,7 @@ class XLSXReader(XLSReader):
     @property
     def headers(self):
         if not self._headers:
-            self._headers = [c.value for c in self._reader.rows[0]]
+            self._headers = map(self.normalize_string,[c.value for c in self._reader.rows[0]])
         return self._headers
 
     def get_items(self):

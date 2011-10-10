@@ -2,6 +2,7 @@
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_unicode
 from data_importer.exceptions import UnknowSource
+import unicodedata
 
 class BaseReader(object):
 
@@ -70,8 +71,14 @@ class BaseReader(object):
     def get_item(self,row):
         """
         Given a header and a row return a sorted dict
-        """ 
-        d = SortedDict(zip(self.headers,map(smart_unicode,row)))
+        """
+        def normalize(s):
+            if isinstance(s,basestring):
+                return smart_unicode(s.strip())
+            else:
+                return s
+
+        d = SortedDict(zip(self.headers,map(normalize,row)))
         # since zip cut tuple to smaller sequence, if we get incomplete
         # lines in file this for over headers put it on row dict
         for k in self.headers:
@@ -92,8 +99,15 @@ class BaseReader(object):
         This method runs as headers property
         """
         if not self._headers:
-            self._headers = self._reader.next()
+            self._headers = map(self.normalize_string,self._reader.next())
         return self._headers
+
+    def normalize_string(self,value):
+        value = value.strip()
+        value = value.lower()
+        value = unicodedata.normalize('NFKD',value).encode('ascii','ignore')
+        value = value.replace(' ','_')
+        return value
 
     def get_items(self):
         """

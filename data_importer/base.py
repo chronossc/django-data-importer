@@ -1,9 +1,11 @@
 # coding: utf-8
 from django.conf import settings
+from .exceptions import UnknowSource
 from .readers import *
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_unicode
 from django.core.exceptions import ValidationError
+from django.db.models.fields.files import FieldFile
 import logging
 import ipdb
 
@@ -47,7 +49,9 @@ class BaseImporter(object):
         """
         try:
             if isinstance(source, file):
-                self.import_file = f
+                self.import_file = source
+            if isinstance(source,FieldFile):
+                self.import_file = open(source.name, 'rb')
             if isinstance(source, basestring):
                 self.import_file = open(source, 'rb')
         except Exception, err:
