@@ -32,6 +32,9 @@ class BaseImporter(object):
         self.reader = self._get_reader(reader,reader_kwargs)
         self.set_logger()
         assert self._validate_class() is True # do not remove this line!!!!
+        if settings.DEBUG:
+            self.logger.setLevel(logging.DEBUG)
+        else:self.logger.setLevel(logging.INFO)
     
     def _validate_class(self):
         """
@@ -102,12 +105,12 @@ class BaseImporter(object):
 
     def _clean_all(self):
         self.errors = SortedDict()
-        for i,row in enumerate(self.reader,1):
+        for i,row in enumerate(self.reader,2):
             self._clean(i,row)
 
     def _iter_clean_all(self):
         self.errors = SortedDict()
-        for i,row in enumerate(self.reader,1):
+        for i,row in enumerate(self.reader,2):
             yield i,self._clean(i,row)
 
     def _clean(self,i,_row):
@@ -151,14 +154,16 @@ class BaseImporter(object):
                 else:
                     line_errors[field].append(append_error(field,u"Field %s is required!" % field))
                 continue
-
         # now validate each field
         for field in self.fields:
+
             if field in line_errors:
                 continue
+            if field not in row:
+                row[field] = u''
             if hasattr(self,'clean_%s' % field):
                 try:
-                    val = getattr(self,'clean_%s' % field)(row[field])
+                    val = getattr(self,'clean_%s' % field)(row[field],row.copy())
                     row[field] = val
                 except ValidationError, msg:
                     if field not in line_errors:
@@ -173,6 +178,7 @@ class BaseImporter(object):
                 for errmsg in error:
                     self.logger.error("Line %s, field %s: %s",i,field,errmsg)
             return False
+
         self._validation_results[i] = row
         return row
 
@@ -193,4 +199,6 @@ class BaseImporter(object):
         Save method should be customized to save data as user want.
         The default one just return row.
         """
-        return row
+        if row:
+            self.logger.info(u"Line %s saved successfully" % i)
+            return row

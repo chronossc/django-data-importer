@@ -3,6 +3,7 @@ from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_unicode
 from data_importer.exceptions import UnknowSource
 import unicodedata
+from data_importer.utils import to_unicode
 
 class BaseReader(object):
 
@@ -74,7 +75,10 @@ class BaseReader(object):
         """
         def normalize(s):
             if isinstance(s,basestring):
-                return smart_unicode(s.strip())
+                try:
+                    return to_unicode(s.strip())
+                except (UnicodeDecodeError,UnicodeEncodeError):
+                    return s.strip()
             else:
                 return s
 
@@ -105,8 +109,12 @@ class BaseReader(object):
     def normalize_string(self,value):
         value = value.strip()
         value = value.lower()
-        value = unicodedata.normalize('NFKD',value).encode('ascii','ignore')
-        value = value.replace(' ','_')
+        try:
+            value = unicodedata.normalize('NFKD',unicode(value))
+        except (UnicodeDecodeError,UnicodeEncodeError):
+            value = unicodedata.normalize('NFKD',to_unicode(value))
+        value = value.encode('ascii','ignore')
+        value = value.replace(u' ',u'_')
         return value
 
     def get_items(self):
