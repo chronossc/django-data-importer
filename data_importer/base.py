@@ -54,7 +54,7 @@ class BaseImporter(object):
             if isinstance(source, file):
                 self.import_file = source
             if isinstance(source,FieldFile):
-                self.import_file = open(source.name, 'rb')
+                self.import_file = open(source.file.name, 'rb')
             if isinstance(source, basestring):
                 self.import_file = open(source, 'rb')
         except Exception, err:
@@ -190,9 +190,19 @@ class BaseImporter(object):
             def save_gen(self):
                 for i,row in self._iter_clean_all():
                     yield self.save(i,row)
+                try:
+                    self.post_save_all()
+                except NotImplementedError:
+                    pass
             return save_gen(self)
         else:
-            return [self.save(i,row) for i,row in self._iter_clean_all()]
+            rows = [self.save(i,row) for i,row in self._iter_clean_all()]
+            try:
+                self.post_save_all()
+            except NotImplementedError:
+                pass
+            return rows
+
 
     def save(self,i,row):
         """
@@ -202,3 +212,10 @@ class BaseImporter(object):
         if row:
             self.logger.info(u"Line %s saved successfully" % i)
             return row
+    
+    def post_save_all(self):
+        """
+        # TODO: use signals
+        Play here if you need to do something with importer after save_all runs.
+        """
+        raise NotImplementedError
