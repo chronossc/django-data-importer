@@ -77,6 +77,13 @@ class BaseImporter(object):
         return READERS_X_EXTENSIONS[parts[-1].lower()](self.import_file,**reader_kwargs)
 
     def set_logger(self):
+        """
+        Initialize the logger, I recommend that you not change this method ;)
+        """
+        try:
+            logging.setLoggerClass(self.get_logger_class())
+        except NotImplementedError:
+            pass
         self.logger = logging.getLogger('%s_importer' % self.__class__.__name__)
         self.logger.propagate = False
         try:
@@ -90,6 +97,13 @@ class BaseImporter(object):
                 self.logger.addHandler(h(*hargs,**hkwargs))
         except NotImplementedError:
             logging.basicConfig(format=u'%(asctime)s :: %(levelname)s :: %(message)s')
+
+    def get_logger_class(self):
+        """
+        Supports a custom logger class that should be instantiated by set_logger.
+        Read http://docs.python.org/library/logging.html#logging.setLoggerClass
+        """
+        return NotImplementedError
 
     def get_logger_handlers(self):
         """
