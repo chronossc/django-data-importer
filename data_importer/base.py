@@ -1,13 +1,12 @@
 # coding: utf-8
-from .exceptions import UnknowSource
-from .readers import *
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models.fields.files import FieldFile
 from django.utils.datastructures import SortedDict
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
-import ipdb
+from data_importer.exceptions import UnknowSource
+from data_importer.readers import *
 import logging
 
 READERS_X_EXTENSIONS = {
@@ -191,7 +190,7 @@ class BaseImporter(object):
             self._validation_results[i] = False
             for field,error in line_errors.items():
                 for errmsg in error:
-                    self.logger.error(_("Line %(line)s, field %(field)s: %(err)s"),line=i,field=field,err=errmsg)
+                    self.logger.error(_("Line %(line)s, field %(field)s: %(err)s") % {'line':i,'field':field,'err':errmsg})
             return False
 
         self._validation_results[i] = row

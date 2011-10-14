@@ -1,5 +1,5 @@
 # coding: utf-8
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 class UnknowSource(Exception):
     msg = _(u"The source file can't be opened")
