@@ -16,6 +16,7 @@ class NullHandler(logging.Handler):
     def createLock(self):
         return None
 
+# define a generic database logger handler.
 class DBLoggingHandler(logging.Handler):
     # based on https://github.com/dcramer/django-db-log/blob/master/djangodblog/handlers.py
     def __init__(self,*args,**kwargs):
@@ -26,4 +27,4 @@ class DBLoggingHandler(logging.Handler):
     def emit(self,record):
         return self.model.objects.create_from_record(record)
         
-# define a generic database logger handler.
+

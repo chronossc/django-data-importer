@@ -1,13 +1,14 @@
 # coding: utf-8
-from django.conf import settings
 from .exceptions import UnknowSource
 from .readers import *
-from django.utils.datastructures import SortedDict
-from django.utils.encoding import smart_unicode
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models.fields.files import FieldFile
-import logging
+from django.utils.datastructures import SortedDict
+from django.utils.encoding import smart_unicode
+from django.utils.translation import ugettext as _
 import ipdb
+import logging
 
 READERS_X_EXTENSIONS = {
     'csv': CSVReader,
@@ -40,9 +41,9 @@ class BaseImporter(object):
         """
         Somethings here is important, as sample we need fields :)
         """
-        assert self.fields not in EMPTY_VALUES,u"You should set attribute fields in class!"
-        assert self.reader is not None,u"Reader not loaded!"
-        assert self.logger is not None,u"Logger not loaded!"
+        assert self.fields not in EMPTY_VALUES,_(u"You should set attribute fields in class!")
+        assert self.reader is not None,_(u"Reader not loaded!")
+        assert self.logger is not None,_(u"Logger not loaded!")
 
         return True
 
@@ -71,9 +72,9 @@ class BaseImporter(object):
 
         parts = self.import_file.name.rsplit('.',1)
         if len(parts) < 2:
-            raise ValueError,u"Impossible to discover file extension! You should specify a reader from data_importer.readers."
+            raise ValueError,_(u"Impossible to discover file extension! You should specify a reader from data_importer.readers.")
         if parts[-1].lower() not in READERS_X_EXTENSIONS:
-            raise ValueError,u"Doesn't exist a relation between file extension and a reader. You should specify a reader from data_importer.readers or crete your own."
+            raise ValueError,_(u"Doesn't exist a relation between file extension and a reader. You should specify a reader from data_importer.readers or crete your own.")
         return READERS_X_EXTENSIONS[parts[-1].lower()](self.import_file,**reader_kwargs)
 
     def set_logger(self):
@@ -164,9 +165,9 @@ class BaseImporter(object):
         for field in self.required_fields:
             if row[field] in EMPTY_VALUES:
                 if field not in line_errors:
-                    line_errors[field] = [append_error(field,u"Field %s is required!" % field)]
+                    line_errors[field] = [append_error(field,_(u"Field %s is required!") % field)]
                 else:
-                    line_errors[field].append(append_error(field,u"Field %s is required!" % field))
+                    line_errors[field].append(append_error(field,_(u"Field %s is required!") % field))
                 continue
         # now validate each field
         for field in self.fields:
@@ -190,7 +191,7 @@ class BaseImporter(object):
             self._validation_results[i] = False
             for field,error in line_errors.items():
                 for errmsg in error:
-                    self.logger.error("Line %s, field %s: %s",i,field,errmsg)
+                    self.logger.error(_("Line %(line)s, field %(field)s: %(err)s"),line=i,field=field,err=errmsg)
             return False
 
         self._validation_results[i] = row
@@ -224,7 +225,7 @@ class BaseImporter(object):
         The default one just return row.
         """
         if row:
-            self.logger.info(u"Line %s saved successfully" % i)
+            self.logger.info(_(u"Line %s saved successfully"),i)
             return row
     
     def post_save_all(self):

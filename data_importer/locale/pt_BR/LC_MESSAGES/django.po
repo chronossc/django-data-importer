@@ -1,0 +1,91 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-10-14 10:04-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: base.py:44
+msgid "You should set attribute fields in class!"
+msgstr ""
+
+#: base.py:45
+msgid "Reader not loaded!"
+msgstr ""
+
+#: base.py:46
+msgid "Logger not loaded!"
+msgstr ""
+
+#: base.py:75
+msgid ""
+"Impossible to discover file extension! You should specify a reader from "
+"data_importer.readers."
+msgstr ""
+
+#: base.py:77
+msgid ""
+"Doesn't exist a relation between file extension and a reader. You should "
+"specify a reader from data_importer.readers or crete your own."
+msgstr ""
+
+#: base.py:168 base.py:170
+#, python-format
+msgid "Field %s is required!"
+msgstr "Campo %s é obrigatório!"
+
+#: base.py:194
+#, python-format
+msgid "Line %(line)s, field %(field)s: %(err)s"
+msgstr "Linha %(line)s, campo %(field)s: %(err)s"
+
+#: base.py:228
+#, python-format
+msgid "Line %s saved successfully"
+msgstr "Linha %s salvo com sucesso"
+
+#: exceptions.py:5
+msgid "The source file can't be opened"
+msgstr "O arquivo não pode ser aberto"
+
+#: exceptions.py:8
+#, python-format
+msgid "%(msg)s, the error was: %(err)s"
+msgstr "%(msg)s, o erro foi: %(err)s"
+
+#: tests/cpfcnpj.py:35
+msgid "Invalid CNPJ number."
+msgstr ""
+
+#: tests/cpfcnpj.py:36
+msgid "CNPJ requires at most 14 digits or 18 characters."
+msgstr ""
+
+#: tests/cpfcnpj.py:37
+msgid "CNPJ requires only numbers, allow '.', '/' and '-' for long format."
+msgstr ""
+
+#: tests/cpfcnpj.py:202
+msgid "Invalid CPF number."
+msgstr ""
+
+#: tests/cpfcnpj.py:203
+msgid "CPF requires at most 11 digits or 14 characters."
+msgstr ""
+
+#: tests/cpfcnpj.py:204
+msgid "CPF requires only numbers, allow '.' and '-' for long format."
+msgstr ""

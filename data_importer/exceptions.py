@@ -1,8 +1,9 @@
 # coding: utf-8
+from django.utils.translation import ugettext as _
 
 class UnknowSource(Exception):
-    msg = u"The source file can't be opened"
+    msg = _(u"The source file can't be opened")
     def __init__(self,err=None):
         if err:
-            self.msg = u"%s, the error was: %s" % (self.msg,err)
+            self.msg = _(u"%(msg)s, the error was: %(err)s") % {'msg':self.msg,'err':err}
 
