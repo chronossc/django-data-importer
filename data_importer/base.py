@@ -145,11 +145,15 @@ class BaseImporter(object):
         This method should be called by self._clean_all
         
         """
+
         if i in self._validation_results:
             return self._validation_results[i]
 
-        line_errors = {}
+
+        line_errors = SortedDict()
         row = _row.copy()
+        row['_i'] = i
+
         def append_error(field,msg):
             if i not in self.errors:
                 self.errors[i] = []
