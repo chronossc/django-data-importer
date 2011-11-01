@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-14 10:04-0300\n"
+"POT-Creation-Date: 2011-11-01 12:33-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,41 +17,50 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: base.py:44
+#: base.py:48
 msgid "You should set attribute fields in class!"
 msgstr ""
 
-#: base.py:45
+#: base.py:49
 msgid "Reader not loaded!"
 msgstr ""
 
-#: base.py:46
+#: base.py:50
 msgid "Logger not loaded!"
 msgstr ""
 
-#: base.py:75
+#: base.py:80
 msgid ""
 "Impossible to discover file extension! You should specify a reader from "
 "data_importer.readers."
 msgstr ""
 
-#: base.py:77
+#: base.py:82
 msgid ""
 "Doesn't exist a relation between file extension and a reader. You should "
 "specify a reader from data_importer.readers or crete your own."
 msgstr ""
 
-#: base.py:168 base.py:170
+#: base.py:88
+msgid "Something goes wrong when try to read the file!"
+msgstr ""
+
+#: base.py:185 base.py:187
 #, python-format
 msgid "Field %s is required!"
 msgstr ""
 
-#: base.py:194
+#: base.py:211
 #, python-format
 msgid "Line %(line)s, field %(field)s: %(err)s"
 msgstr ""
 
-#: base.py:228
+#: base.py:239
+#, python-format
+msgid "Process stoped with error %s."
+msgstr ""
+
+#: base.py:248
 #, python-format
 msgid "Line %s saved successfully"
 msgstr ""

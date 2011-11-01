@@ -1,4 +1,5 @@
 # coding: utf-8
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models.fields.files import FieldFile
@@ -7,7 +8,11 @@ from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 from data_importer.exceptions import UnknowSource
 from data_importer.readers import *
+import sys
 import logging
+
+class FailedInStart(Exception):
+    pass
 
 READERS_X_EXTENSIONS = {
     'csv': CSVReader,
@@ -28,9 +33,9 @@ class BaseImporter(object):
     
     def __init__(self,import_file,reader=None,reader_kwargs={}):
         self._validation_results = SortedDict()
+        self.set_logger()
         self._load(import_file)
         self.reader = self._get_reader(reader,reader_kwargs)
-        self.set_logger()
         assert self._validate_class() is True # do not remove this line!!!!
         if settings.DEBUG:
             self.logger.setLevel(logging.DEBUG)
@@ -66,15 +71,22 @@ class BaseImporter(object):
         """
         Initialize reader or choose one of existents based on extension of file.
         """
-        if reader:
-            return reader(self.import_file,**reader_kwargs)
+        try:
+            if reader:
+                return reader(self.import_file,**reader_kwargs)
 
-        parts = self.import_file.name.rsplit('.',1)
-        if len(parts) < 2:
-            raise ValueError,_(u"Impossible to discover file extension! You should specify a reader from data_importer.readers.")
-        if parts[-1].lower() not in READERS_X_EXTENSIONS:
-            raise ValueError,_(u"Doesn't exist a relation between file extension and a reader. You should specify a reader from data_importer.readers or crete your own.")
-        return READERS_X_EXTENSIONS[parts[-1].lower()](self.import_file,**reader_kwargs)
+            parts = self.import_file.name.rsplit('.',1)
+            if len(parts) < 2:
+                raise ValueError,_(u"Impossible to discover file extension! You should specify a reader from data_importer.readers.")
+            if parts[-1].lower() not in READERS_X_EXTENSIONS:
+                raise ValueError,_(u"Doesn't exist a relation between file extension and a reader. You should specify a reader from data_importer.readers or crete your own.")
+            return READERS_X_EXTENSIONS[parts[-1].lower()](self.import_file,**reader_kwargs)
+        except Exception, err:
+            import traceback
+            exc_info = sys.exc_info()
+            self.logger.debug("\n".join(traceback.format_exception(*exc_info)))
+            self.logger.critical(_("Something goes wrong when try to read the file!"))
+            raise
 
     def set_logger(self):
         """
@@ -149,7 +161,6 @@ class BaseImporter(object):
         if i in self._validation_results:
             return self._validation_results[i]
 
-
         line_errors = SortedDict()
         row = _row.copy()
         row['_i'] = i
@@ -204,22 +215,25 @@ class BaseImporter(object):
         return self.save_all(use_generator=True)
 
     def save_all(self,use_generator=False):
-        if use_generator:
-            def save_gen(self):
-                for i,row in self._iter_clean_all():
-                    yield self.save(i,row)
+        try:
+            if use_generator:
+                def save_gen(self):
+                    for i,row in self._iter_clean_all():
+                        yield self.save(i,row)
+                    try:
+                        self.post_save_all()
+                    except NotImplementedError:
+                        pass
+                return save_gen(self)
+            else:
+                rows = [self.save(i,row) for i,row in self._iter_clean_all()]
                 try:
                     self.post_save_all()
                 except NotImplementedError:
                     pass
-            return save_gen(self)
-        else:
-            rows = [self.save(i,row) for i,row in self._iter_clean_all()]
-            try:
-                self.post_save_all()
-            except NotImplementedError:
-                pass
-            return rows
+                return rows
+        except Exception, err:
+            self.logger.critical(_("Process stoped with error %s."),err)
 
 
     def save(self,i,row):
