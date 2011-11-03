@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from data_importer.exceptions import UnknowSource
 from data_importer.readers import *
 import sys
+import traceback
 import logging
 
 class FailedInStart(Exception):
@@ -82,7 +83,6 @@ class BaseImporter(object):
                 raise ValueError,_(u"Doesn't exist a relation between file extension and a reader. You should specify a reader from data_importer.readers or crete your own.")
             return READERS_X_EXTENSIONS[parts[-1].lower()](self.import_file,**reader_kwargs)
         except Exception, err:
-            import traceback
             exc_info = sys.exc_info()
             self.logger.debug("\n".join(traceback.format_exception(*exc_info)))
             self.logger.critical(_("Something goes wrong when try to read the file!"))
@@ -161,6 +161,10 @@ class BaseImporter(object):
         if i in self._validation_results:
             return self._validation_results[i]
 
+        if not any(_row.values()):
+            self.logger.warning(u"Linha %s é vazia, foi ignorada." % i)
+            return
+
         line_errors = SortedDict()
         row = _row.copy()
         row['_i'] = i
@@ -233,6 +237,8 @@ class BaseImporter(object):
                     pass
                 return rows
         except Exception, err:
+            exc_info = sys.exc_info()
+            self.logger.debug(self.logger.debug("\n".join(traceback.format_exception(*exc_info))))
             self.logger.critical(_("Process stoped with error %s."),err)
 
 

@@ -13,5 +13,5 @@ class CSVReader(BaseReader):
 
     def get_items(self):
         for row in self._reader:
-            if not row: continue
+            #if not row: continue
             yield self.get_item(row)
