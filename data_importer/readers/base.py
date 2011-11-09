@@ -59,15 +59,16 @@ class BaseReader(object):
         """
         self._reader = open(self._source.name,'rb')
 
-    def get_value(self,item,field):
+    def get_value(self,item,**kwargs):
         """
-        Receive item and field and should return value of field in item. Can be
-        customized to handle various types.
+        Receive item from source and should return formated value.
+        Can be customized to handle various types. The default just return
+        value.
+
+        This method isn't used in base implementation, but readers that have
+        different values for data types like xml can use that.
         """
-        val = item.get(field.encode('utf-8'), None)
-        if val is not None:
-            return smart_unicode(val)
-        return val
+        return item
 
     def get_item(self,row):
         """
