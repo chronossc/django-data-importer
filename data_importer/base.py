@@ -96,26 +96,34 @@ class BaseImporter(object):
             logging.setLoggerClass(self.get_logger_class())
         except NotImplementedError:
             pass
+
+        try:
+            handlers = self.get_logger_handlers()
+        except NotImplementedError:
+            handlers = []
+            logging.basicConfig(format=u'%(asctime)s :: %(levelname)s :: %(message)s')
+
         self.logger = logging.getLogger('%s_importer' % self.__class__.__name__)
         self.logger.propagate = False
+
+        for h,hargs,hkwargs in handlers:
+            self.logger.addHandler(h(*hargs,**hkwargs))
+
+        if not self.logger.handlers:
+            self.logger.handlers = self.logger.parent.handlers
+
         try:
             if settings.DEBUG:
                 self.logger.setLevel(logging.DEBUG)
         except ImportError:
             pass
-        try:
-            self.logger.handlers = []
-            for h,hargs,hkwargs in self.get_logger_handlers():
-                self.logger.addHandler(h(*hargs,**hkwargs))
-        except NotImplementedError:
-            logging.basicConfig(format=u'%(asctime)s :: %(levelname)s :: %(message)s')
 
     def get_logger_class(self):
         """
         Supports a custom logger class that should be instantiated by set_logger.
         Read http://docs.python.org/library/logging.html#logging.setLoggerClass
         """
-        return NotImplementedError
+        raise NotImplementedError
 
     def get_logger_handlers(self):
         """
