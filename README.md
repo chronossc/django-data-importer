@@ -35,7 +35,7 @@ class Importer1(BaseImporter):
         from django.core.validators import validate_email
         validate_email(val)
         return val
-        
+
 
 ```
 ### Important (and basic) things!
@@ -43,10 +43,10 @@ class Importer1(BaseImporter):
 1. You should define fields that you will have on your files, and first line of files should be headers. required_fields is optional.
 
 2. If you wanna to validate your fields you should implement methods in importer like clean_<field_name>. The method will receive a attr **val** and should return cleaned value or raise ValidationError.
-                                                                                                                                               
+
 3. You **SHOULD** write a save method in Importer. The save method receive i and row, where i is number of line, and row is a dict with validated row. Otherwise you will receive only a dict with data.
-                                                                                                                        
-                                                                                                                                               
+
+
 ##3. Instantiate importer and than save
 
 Create a new instance of importer with the file:
@@ -60,14 +60,14 @@ And than, just call **save_all** or **save_all_iter**:
 ```python
 results = importer.save_all()
 
-#or
+### or
 for i,result in enumerate(importer.save_all_iter(),1):
     # result can be False or a dict with row data
     if result is False:
         print u"Line %s: Invalid entry." % i
     else:
         print result # {'email': u'mail1@devwithpassion.com', 'field1': u'django', 'field2': u'data', 'field3': u'importer'}
-        
+
 ```
 
 # Some cool logging stuff
@@ -83,7 +83,7 @@ See the example:
 from django.db import models
 from data_importer import BaseImporter
 
-# first the Error model
+### first the Error model
 LOG_LEVELS = (
     (logging.INFO, 'info'),
     (logging.WARNING, 'warning'),
@@ -107,12 +107,12 @@ class Error(models.Model):
     msg = models.TextField()
     levelno = models.IntegerField(choices=LOG_LEVELS)
     created = models.DateTimeField(auto_now_add=True)
-    
 
-# now my importer
+
+### now my importer
 class Importer2(BaseImporter):
     fields = ['email','field1','field2','field3']
-    
+
     def get_logger_handlers(self):
         # A internal method will initiate DBLoggingHandler, so you send args and kwargs.
         # With this way you can provide many handlers as you want :)
@@ -123,7 +123,7 @@ class Importer2(BaseImporter):
         validate_email(val)
         # validate_email raises ValidationError if invalid
 
-# than run
+### than run
 importer = Importer1(csv_file)
 importer.save_all()
 
@@ -141,15 +141,15 @@ To test the project you need to go to sampleproject and run ./manage.py test dat
 
 If you like the project, plz, contact me at philipe.rp@gmail.com (gtalk and email) and help me improve it.
 
-Here is some stuff that I like to put:
+Here is some stuff that I like to do:
 
+* Make data_importer works without Django, so anyone in Python world can use it.
 * Better logging support on various methods of BaseImporter
 * Add a SentryLogginHandler to data_importer
 * Add support to more file formats, like openoffice ones, pure xmls, JSON and any other type adding readers to it.
 * Add support to stream in readers, so user can put text instead a file and maybe avoid disk I/O.
 * Add support to gettext and internatiolization
 * Add a ModelBaseReader class that read fields from a Model and save directly to a model, using model field validations.
-* Make data_importer works without Django, so anyone in Python world can use it.
 
 **If you will contribute, I'll keep master branch stable and develop all things on master_dev branche.**
 
