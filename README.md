@@ -131,7 +131,45 @@ importer.save_all()
 
 BaseImporter set self.logger as a logging instance with name of class, so any call to self.logger.<debug|info|warning|error|critical> method will log to DBLoggingHandler now.
 
-You can find a better model for DBLogging in tests :).
+You can find a better model for DBLogging in tests :).default
+
+# A note on readers
+
+Readers are very independent of importer (but importer isn't from readers). I have for a long time now using many times readers out of data-importer, so you can do it too. There is a snippet of a management command class that use readers to read a file with a e-mail column and do mostly searchs:
+
+```python
+
+class Command(BaseCommand):
+    args = '<file_with_email_column>'
+    def handle(self,*args,**options):
+        print args
+        fname = args[0]
+        if '.csv' in fname.lower():
+            reader = CSVReader(fname)
+        elif '.xlsx' in fname.lower():
+            reader = XLSXReader(fname)
+        elif '.xls' in fname.lower():
+            reader = XLSReader(fname)
+        else:
+            raise CommandError,u'Supported extensions are only CSV, XLS and XLSX'
+
+        lines = list(reader)
+        print lines[0]
+        print reader.headers
+
+        if len(lines) == 0:
+            raise CommandError,u'The file %s is empty.' % fname
+
+        if not (lines[0].has_key('email') and lines[0]['email']) and \
+                not (lines[0].has_key('e-mail') and lines[0]['e-mail']):
+            raise CommandError,u'No e-mail column found in file %s' % fname
+
+        # the search is done in LDAP trought django-ldapdb, but does not matters here.
+
+```
+
+The bad point is that you don't have control over values, if is valid or not for you, but can be useful when a importer is to much.
+
 
 # Docs, Developing and testing data_importer
 
