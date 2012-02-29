@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="django-data-importer",
-    version="0.0.1",
+    version="0.0.2",
     description="",
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
