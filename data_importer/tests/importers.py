@@ -22,10 +22,10 @@ class SimpleValidationsImporter(BaseImportWithFields):
     """
     Since all tested importers will validate same data, we can write only one
     with validate methods.
-    This importer doesn't implement save method that return data as dict in 
+    This importer doesn't implement save method that return data as dict in
     BaseImporter.save and doesn't put any field as required.
     """
-    def clean_cpf(self,val):
+    def clean_cpf(self,val,row):
         # field isn't required in this class!
         if not val: return val
         try:
@@ -39,7 +39,7 @@ class SimpleValidationsImporterDB(SimpleValidationsImporter):
     """
     Since all tested importers will validate same data, we can write only one
     with validate methods.
-    This importer doesn't implement save method that return data as list of dict in 
+    This importer doesn't implement save method that return data as list of dict in
     BaseImporter.save and doesn't put any field as required.
     """
 
@@ -50,12 +50,12 @@ class RequiredFieldValidationsImporter(SimpleValidationsImporter):
     """
     Since all tested importers will validate same data, we can write only one
     with validate methods.
-    This importer doesn't implement save method that return data as list of dict in 
+    This importer doesn't implement save method that return data as list of dict in
     BaseImporter.save but use CPF and FIELD3 fields as required.
     """
     required_fields = ['cpf','field3']
 
-    def clean_cpf(self,val):
+    def clean_cpf(self,val,row):
         try:
             val = CPF(val)
         except ValueError,msg:
@@ -67,7 +67,7 @@ class RequiredFieldValidationsImporterDB(RequiredFieldValidationsImporter):
     """
     Since all tested importers will validate same data, we can write only one
     with validate methods.
-    This importer doesn't implement save method that return data as list of dict in 
+    This importer doesn't implement save method that return data as list of dict in
     BaseImporter.save but use CPF and FIELD3 fields as required.
     """
 

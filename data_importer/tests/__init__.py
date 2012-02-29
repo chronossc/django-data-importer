@@ -33,7 +33,7 @@ def setUpClassData(klass):
         'csv_invalid_cpf_sheet': os.path.join(mod_dir,'fixtures','csv_invalid_cpf_sheet.csv'), # used to get validation errors
         'csv_sheet': os.path.join(mod_dir,'fixtures','csv_sheet.csv'),
         'xls_sheet': os.path.join(mod_dir,'fixtures','xls_sheet.xls'),
-        'xlsx_sheet': os.path.join(mod_dir,'fixtures','xlsx_sheet.xlsx'),           
+        'xlsx_sheet': os.path.join(mod_dir,'fixtures','xlsx_sheet.xlsx'),
     }
 
     klass.f_headers = ['cpf','field3','field4','field5']
@@ -50,7 +50,7 @@ class ReaderTest(TestCase):
     Test various readers results against already know data.
 
     """
-    
+
     def setUp(self):
         setUpClassData(self)
 
@@ -154,7 +154,7 @@ class BaseImporterTests(TestCase):
         instances = []
         for i in importer.logger.handlers:
             self.assertTrue(i.__class__.__name__ not in instances,u"More than one logger with same class found in importer.logger.handlers")
-            instances.append(i.__class__.__name__)                     
+            instances.append(i.__class__.__name__)
 
 class ImportersValidationsTests(TestCase):
     """
@@ -187,7 +187,6 @@ class ImportersValidationsTests(TestCase):
         importer = SimpleValidationsImporter(self.files['csv_invalid_cpf_sheet'])
         self.assertTrue(not importer.is_valid(),u"Should return False to is_valid()")
         self.assertNotEquals(SortedDict(),importer.errors) # importer.errors shouldn't be empty
-
         for i in importer.errors:
             self.assertEquals(True,i in self.invalid_lines)
             for k,v in importer.errors[i].items():
@@ -238,9 +237,10 @@ class ImportersValidationsTests(TestCase):
         self.assertTrue(isinstance(importer.logger.handlers[0],DBLoggingHandler),u"Logger handler isn't DBLoggingHandler")
 
         errors = Error.objects.all()
-        self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 1, field field3: Field field3 is required!" in \
-            str(errors[0]),u"Weird string for this test, check loggers.")
+
         self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 1, field cpf: Field cpf is required!" in \
+            str(errors[0]),u"Weird string for this test, check loggers.")
+        self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 1, field field3: Field field3 is required!" in \
             str(errors[1]),u"Weird string for this test, check loggers.")
         self.assertTrue(u"RequiredFieldValidationsImporterDB_importer :: error :: Line 2, field cpf: Invalid CPF number." in \
             str(errors[2]),u"Weird string for this test, check loggers.")
@@ -256,7 +256,7 @@ class ImportersValidationsTests(TestCase):
         for i,know_data in enumerate(self.data_invalid):
             data = results[i]
             if not data and i+1 in invalid_lines: # dict data starts from 1
-                self.assertEquals(data,False)
+                self.assertEquals(data,None)
             else:
                 for k,v in know_data.items():
                     # RequiredFieldValidationsImporterDB should return field

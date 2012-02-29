@@ -16,7 +16,7 @@ class MockLoggingHandler(logging.Handler):
         self.messages = {
             'debug':[],
             'info':[],
-            'warninig':[],
+            'warning':[],
             'error':[],
             'critical':[],
         }

@@ -31,7 +31,7 @@ class BaseImporter(object):
     reader = None
     loaded = False
     errors = SortedDict() # {lineNum:list(set([error1,error2])),...}
-    
+
     def __init__(self,import_file,reader=None,reader_kwargs={}):
         self._validation_results = SortedDict()
         self.set_logger()
@@ -41,7 +41,7 @@ class BaseImporter(object):
         if settings.DEBUG:
             self.logger.setLevel(logging.DEBUG)
         else:self.logger.setLevel(logging.INFO)
-    
+
     def _validate_class(self):
         """
         Somethings here is important, as sample we need fields :)
@@ -104,8 +104,12 @@ class BaseImporter(object):
             logging.basicConfig(format=u'%(asctime)s :: %(levelname)s :: %(message)s')
 
         self.logger = logging.getLogger('%s_importer' % self.__class__.__name__)
+        # remove handlers that can come with logger
+        for h in self.logger.handlers:
+            self.logger.removeHandler(h)
         self.logger.propagate = False
 
+        # set defined handlers as defined in self.get_logger_handlers
         for h,hargs,hkwargs in handlers:
             self.logger.addHandler(h(*hargs,**hkwargs))
 
@@ -139,12 +143,12 @@ class BaseImporter(object):
 
     def _clean_all(self):
         self.errors = SortedDict()
-        for i,row in enumerate(self.reader,2):
+        for i,row in enumerate(self.reader,1):
             self._clean(i,row)
 
     def _iter_clean_all(self):
         self.errors = SortedDict()
-        for i,row in enumerate(self.reader,2):
+        for i,row in enumerate(self.reader,1):
             yield i,self._clean(i,row)
 
     def _clean(self,i,_row):
@@ -163,7 +167,7 @@ class BaseImporter(object):
 
         DON'T CALL THIS METHOD DIRECTLY!!
         This method should be called by self._clean_all
-        
+
         """
 
         if i in self._validation_results:
@@ -258,7 +262,7 @@ class BaseImporter(object):
         if row:
             self.logger.info(_(u"Line %s saved successfully"),i)
             return row
-    
+
     def post_save_all(self):
         """
         # TODO: use signals
