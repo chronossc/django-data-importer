@@ -1,4 +1,8 @@
-from distutils.core import setup
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# from distutils.core import setup
+from setuptools import setup, find_packages
 
 setup(
     name="django-data-importer",
@@ -7,7 +11,7 @@ setup(
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
     url="http://github.com/chronossc/django-data-importer",
-    packages=['data_importer'],
+    packages = find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
@@ -22,5 +26,6 @@ setup(
         "Django >= 1.2.7",
         "openpyxl",
         "xlrd"
-    ]
+    ],
+    zip_safe = False,
 )
