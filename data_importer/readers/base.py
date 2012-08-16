@@ -83,8 +83,12 @@ class BaseReader(object):
             else:
                 return s
 
-        d = SortedDict(zip(self.headers,map(normalize,row)))
-        # since zip cut tuple to smaller sequence, if we get incomplete
+        # if we have headers = ['a','b'] and values [1,2,3,4], dict will be
+        # {'a':1,'b':2}
+        # if we have headers = ['a','b','c','d'] and values [1,2], dict will be
+        # {'a':1,'b':2}
+        d = SortedDict([i for i in zip(self.headers,map(normalize,row)) if i[0]])
+        # since zip can cut tuple to smaller sequence, if we get incomplete
         # lines in file this for over headers put it on row dict
         for k in self.headers:
             if k not in d:

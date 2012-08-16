@@ -169,7 +169,6 @@ class BaseImporter(object):
         This method should be called by self._clean_all
 
         """
-
         if i in self._validation_results:
             return self._validation_results[i]
 

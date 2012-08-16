@@ -57,7 +57,7 @@ class XLSReader(BaseReader):
     def get_items(self):
         for r in range(1,self.nrows):
             values = [self.get_value(self._reader.cell(r,c)) for c in range(self.ncols)]
-            if not all(values): continue # empty lines are ignored
+            if not any(values): continue # empty lines are ignored
             yield self.get_item(values)
 
 class XLSXReader(XLSReader):
@@ -87,7 +87,7 @@ class XLSXReader(XLSReader):
     def get_items(self):
         for row in self._reader.rows[1:]:
             values = [self.get_value(c) for c in list(row)]
-            if not all(values): continue # empty lines are ignored
+            if not any(values): continue # empty lines are ignored
             yield self.get_item(values)
 
 
