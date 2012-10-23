@@ -107,11 +107,14 @@ class BaseReader(object):
 
         This method runs as headers property
         """
+
         if not self._headers:
             self._headers = map(self.normalize_string,self._reader.next())
         return self._headers
 
     def normalize_string(self,value):
+        if not value:
+            return ''
         value = value.strip()
         value = value.lower()
         try:
