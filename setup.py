@@ -6,12 +6,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="django-data-importer",
-    version="0.1.0",
+    version="0.1.0-p1",
     description="",
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
     url="http://github.com/chronossc/django-data-importer",
-    packages = find_packages(),
+    packages = find_packages(exclude=('sampleprojet',)),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
