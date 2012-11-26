@@ -82,7 +82,7 @@ class BaseImporter(object):
             if parts[-1].lower() not in READERS_X_EXTENSIONS:
                 raise ValueError,_(u"Doesn't exist a relation between file extension and a reader. You should specify a reader from data_importer.readers or crete your own.")
             return READERS_X_EXTENSIONS[parts[-1].lower()](self.import_file,**reader_kwargs)
-        except Exception, err:
+        except Exception:
             exc_info = sys.exc_info()
             self.logger.debug("\n".join(traceback.format_exception(*exc_info)))
             self.logger.critical(_("Something goes wrong when try to read the file!"))
@@ -247,10 +247,10 @@ class BaseImporter(object):
                 except NotImplementedError:
                     pass
                 return rows
-        except Exception, err:
+        except Exception as err:
             exc_info = sys.exc_info()
             self.logger.debug(self.logger.debug("\n".join(traceback.format_exception(*exc_info))))
-            self.logger.critical(_("Process stoped with error %s."),err)
+            self.logger.critical(_("Process stoped with error %s: %s."),err.__class__.__name__, err)
 
 
     def save(self,i,row):
