@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="django-data-importer",
-    version="0.1.0-p2",
+    version="0.1.0-p3",
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
     mainteiner="Felipe 'chronos' Prenholato",
@@ -17,7 +17,7 @@ setup(
     long_description="*data_importer* is a importer tool that allow you write "
         "your own importer, with validation for each field and line of imported "
         "file. It come with support for CSV, XLS and XLSX files and a lot of "
-        "examples in tests, logging support, and more."
+        "examples in tests, logging support, and more.",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
