@@ -6,12 +6,18 @@ from setuptools import setup, find_packages
 
 setup(
     name="django-data-importer",
-    version="0.1.0-p1",
-    description="",
+    version="0.1.0-p2",
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
+    mainteiner="Felipe 'chronos' Prenholato",
+    mainteiner_email="philipe.rp@gmail.com",
     url="http://github.com/chronossc/django-data-importer",
     packages = find_packages(exclude=('sampleprojet',)),
+    description="Generic, easy to use, file reader and importer with validations like Django forms.",
+    long_description="*data_importer* is a importer tool that allow you write "
+        "your own importer, with validation for each field and line of imported "
+        "file. It come with support for CSV, XLS and XLSX files and a lot of "
+        "examples in tests, logging support, and more."
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
