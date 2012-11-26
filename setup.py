@@ -6,14 +6,14 @@ from setuptools import setup, find_packages
 
 setup(
     name="django-data-importer",
-    version="0.0.2",
+    version="0.1.0",
     description="",
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
     url="http://github.com/chronossc/django-data-importer",
     packages = find_packages(),
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: Web Environment",
         "Framework :: Django",
@@ -23,7 +23,7 @@ setup(
         "Programming Language :: Python",
     ],
     install_requires=[
-        "Django >= 1.2.7",
+        "Django >= 1.3.4",
         "openpyxl",
         "xlrd"
     ],
