@@ -48,9 +48,9 @@ class XLSReader(BaseReader):
 
         if item.ctype == XL_CELL_NUMBER:
             if item.value % 1 == 0: # integers
-                return str(int(item.value))
+                return int(item.value)
             else:
-                return str(item.value)
+                return item.value
 
         return item.value
 
@@ -82,6 +82,9 @@ class XLSXReader(XLSReader):
         # Thx to Augusto C Men to point fast solution for XLS/XLSX dates
         if item.is_date() and isinstance(item,(int,float)):
             return datetime.date(1899,12,30) + datetime.timedelta(days=item)
+        if item.value is None:
+            if item.data_type == item.TYPE_STRING:
+                return ''
         return item.value
 
     def get_items(self):

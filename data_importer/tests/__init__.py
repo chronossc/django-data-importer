@@ -40,8 +40,8 @@ def setUpClassData(klass):
     klass.f_data = [
         {'cpf': u'437.692.351-69', 'field3': u'', 'field4': u'Emperor Palpatine: Soon the Rebellion will be crushed and young Skywalker will be one of us!', 'field5': u''},
         {'cpf': u'541.903.660-64', 'field3': u'Darth Vader: When I left you, I was but the learner. Now I am the master.', 'field4': u'some data for field 4', 'field5': u''},
-        {'cpf': u'96177843514', 'field3': u'Ben (Obi-Wan) Kenobi: The Force can have a strong influence on a weak mind.', 'field4': u'', 'field5': u'some data for field 5'},
-        {'cpf': u'87894839957', 'field3': u'Ben (Obi-Wan) Kenobi: The Force can have a strong influence on a weak mind.', 'field4': u'', 'field5': u''},
+        {'cpf': 96177843514, 'field3': u'Ben (Obi-Wan) Kenobi: The Force can have a strong influence on a weak mind.', 'field4': u'', 'field5': u'some data for field 5'},
+        {'cpf': 87894839957, 'field3': u'Ben (Obi-Wan) Kenobi: The Force can have a strong influence on a weak mind.', 'field4': u'', 'field5': u''},
         {'cpf': u'933.331.456-34', 'field3': u"Princess Leia: Aren't you a little short for a stormtrooper?", 'field4': u'', 'field5': u''},
     ]
 
@@ -57,7 +57,9 @@ class ReaderTest(TestCase):
     def compare_lines(self,lines):
         for i,line in enumerate(lines):
             for k in line:
-                self.assertEquals(self.f_data[i][k],line[k])
+                self.assertEquals(self.f_data[i][k],line[k],
+                    "Line %s, %s failed: %s != %s." % (i, k,
+                        repr(self.f_data[i][k]), repr(line[k])))
 
     def test_base_reader_init(self):
         self.assertTrue(os.path.isfile(self.files['csv_sheet']),u"file for basereader test not exists")
