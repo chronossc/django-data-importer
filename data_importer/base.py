@@ -11,6 +11,7 @@ from data_importer.readers import *
 import sys
 import traceback
 import logging
+import warnings
 
 class FailedInStart(Exception):
     pass
@@ -229,29 +230,55 @@ class BaseImporter(object):
     def save_all_iter(self):
         return self.save_all(use_generator=True)
 
-    def save_all(self,use_generator=False):
-        try:
-            if use_generator:
-                def save_gen(self):
-                    for i,row in self._iter_clean_all():
-                        yield self.save(i,row)
-                    try:
-                        self.post_save_all()
-                    except NotImplementedError:
-                        pass
-                return save_gen(self)
-            else:
-                rows = [self.save(i,row) for i,row in self._iter_clean_all()]
-                try:
-                    self.post_save_all()
-                except NotImplementedError:
-                    pass
-                return rows
-        except Exception as err:
-            exc_info = sys.exc_info()
-            self.logger.debug(self.logger.debug("\n".join(traceback.format_exception(*exc_info))))
-            self.logger.critical(_("Process stoped with error %s: %s."),err.__class__.__name__, err)
-
+    # def save_all(self,use_generator=False):
+    #     try:
+    #         if use_generator:
+    #             def save_gen(self):
+    #                 for i,row in self._iter_clean_all():
+    #                     try:
+    #                         yield self.save(i,row)
+    #                     except Exception:
+    #                         raise
+    #                 try:
+    #                     self.post_save_all()
+    #                 except NotImplementedError:
+    #                     pass
+    #             return save_gen(self)
+    #         else:
+    #             rows = [self.save(i,row) for i,row in self._iter_clean_all()]
+    #             try:
+    #                 self.post_save_all()
+    #             except NotImplementedError:
+    #                 pass
+    #             return rows
+    #     except Exception as err:
+    #         import ipdb; ipdb.set_trace()
+    #         exc_info = sys.exc_info()
+    #         self.logger.debug(self.logger.debug("\n".join(traceback.format_exception(*exc_info))))
+    #         self.logger.critical(_("Process stoped with error %s: %s."),err.__class__.__name__, err)
+    def save_all(self, use_generator=False):
+        # if use_generator:
+        #     warnings.warn("Since 0.2.0 we removed generator and support to "
+        #         "save_all_iter, that just call save_all. In 0.5.0 save_all_iter"
+        #         "will be removed.")
+        # try:
+        #     rows = []
+        #     for i, row in self._iter_clean_all():
+        #         try:
+        #             rows.append(self.save(i, row))
+        #         except Exception as err:
+        #             exc_info = sys.exc_info()
+        #             self.logger.error(_("ERROR ON SAVE line %(line)s, : %(err)s") % {'line': i, 'err': err})
+        #             self.logger.debug(self.logger.debug(
+        #                 "DEBUG: %s\n%s" % (err, u"\n".join(traceback.format_exception(*exc_info)))))
+        #     return rows
+        # except Exception as err:
+        #     exc_info = sys.exc_info()
+        #     self.logger.critical(_("CRITICAL: Process stoped with error %s: %s."),err.__class__.__name__, err)
+        #     self.logger.debug(self.logger.debug(
+        #         "DEBUG: %s\n%s" % (err, u"\n".join(traceback.format_exception(*exc_info)))))
+        for i, row in self._iter_clean_all():
+            yield self.save(i, row)
 
     def save(self,i,row):
         """
