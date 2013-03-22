@@ -29,16 +29,14 @@ Import BaseImporter and extend it with your class.
 from data_importer import BaseImporter
 
 class Importer1(BaseImporter):
-    fields = ['email','field1','field2','field3']
-    required_fields = ['email'] # optional
+    fields = ['email', 'field1', 'field2', 'field3']
+    required_fields = ['email']  # optional
 
-    def clean_email(self,val):
+    def clean_email(self, val, row):
         # validate_email raises ValidationError if invalid
         from django.core.validators import validate_email
         validate_email(val)
         return val
-
-
 ```
 ### Important (and basic) things!
 
@@ -63,13 +61,12 @@ And than, just call **save_all** or **save_all_iter**:
 results = importer.save_all()
 
 ### or
-for i,result in enumerate(importer.save_all_iter(),1):
+for i, result in enumerate(importer.save_all_iter(), 1):
     # result can be False or a dict with row data
     if result is False:
         print u"Line %s: Invalid entry." % i
     else:
-        print result # {'email': u'mail1@devwithpassion.com', 'field1': u'django', 'field2': u'data', 'field3': u'importer'}
-
+        print result  # {'email': u'mail1@devwithpassion.com', 'field1': u'django', 'field2': u'data', 'field3': u'importer'}
 ```
 
 # Some cool logging stuff
@@ -113,22 +110,22 @@ class Error(models.Model):
 
 ### now my importer
 class Importer2(BaseImporter):
-    fields = ['email','field1','field2','field3']
+    fields = ['email', 'field1', 'field2', 'field3']
 
     def get_logger_handlers(self):
         # A internal method will initiate DBLoggingHandler, so you send args and kwargs.
         # With this way you can provide many handlers as you want :)
-        return [(DBLoggingHandler,(),{'model':Error})]
+        return [(DBLoggingHandler, (), {'model': Error})]
 
-    def clean_email(self,val):
+    def clean_email(self, val, row):
         from django.core.validators import validate_email
         validate_email(val)
         # validate_email raises ValidationError if invalid
+        return val
 
 ### than run
 importer = Importer1(csv_file)
 importer.save_all()
-
 ```
 
 BaseImporter set self.logger as a logging instance with name of class, so any call to self.logger.<debug|info|warning|error|critical> method will log to DBLoggingHandler now.
@@ -143,7 +140,7 @@ Readers are very independent of importer (but importer isn't from readers). I ha
 
 class Command(BaseCommand):
     args = '<file_with_email_column>'
-    def handle(self,*args,**options):
+    def handle(self, *args, **options):
         print args
         fname = args[0]
         if '.csv' in fname.lower():
@@ -153,21 +150,20 @@ class Command(BaseCommand):
         elif '.xls' in fname.lower():
             reader = XLSReader(fname)
         else:
-            raise CommandError,u'Supported extensions are only CSV, XLS and XLSX'
+            raise CommandError, u'Supported extensions are only CSV, XLS and XLSX'
 
         lines = list(reader)
         print lines[0]
         print reader.headers
 
         if len(lines) == 0:
-            raise CommandError,u'The file %s is empty.' % fname
+            raise CommandError(u'The file %s is empty.' % fname)
 
         if not (lines[0].has_key('email') and lines[0]['email']) and \
                 not (lines[0].has_key('e-mail') and lines[0]['e-mail']):
-            raise CommandError,u'No e-mail column found in file %s' % fname
+            raise CommandError(u'No e-mail column found in file %s' % fname)
 
         # the search is done in LDAP trought django-ldapdb, but does not matters here.
-
 ```
 
 The bad point is that you don't have control over values, if is valid or not for you, but can be useful when a importer is to much.
